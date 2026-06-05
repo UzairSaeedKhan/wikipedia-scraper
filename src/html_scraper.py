@@ -4,6 +4,10 @@ from src.logger import get_logger
 logger = get_logger(__name__)
 
 class WikipediaScraper:
+    '''
+    A class responsible for fetching and processing HTML content from Wikipedia pages, 
+    extracting relevant information, and saving it in a structured format.
+    '''
     def __init__(self, session):
         self.session = session
         self.session.headers.update({

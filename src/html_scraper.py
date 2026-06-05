@@ -1,30 +1,37 @@
 
-from bs4 import BeautifulSoup, soup
+from bs4 import BeautifulSoup
 import json, requests, re
+from src.logger import get_logger
+logger = get_logger(__name__)
 
 class WikipediaScraper:
     def __init__(self, session):
         self.session = session
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (compatible; my-script/1.0; your@email.com)"
+    })
     
     def fetch_html(self, url: str) -> str:
         # Fetches the HTML content of the given URL using the requests library, ensuring that the session is properly managed 
         # and that any potential issues with the request are handled gracefully.
+        logger.info(f"Fetching HTML for {url}")
         try:
             response = self.session.get(url)
             response.raise_for_status()  # Check if the request was successful
             return response.text
         except requests.RequestException as req_err:
-            print(f"Request error occurred while fetching {url}: {req_err}")
+            logger.warning(f"Request failed for {url}: {req_err}")
             raise
         except requests.HTTPError as http_err:
-            print(f"HTTP error occurred while fetching {url}: {http_err}")
+            logger.warning(f"Request failed for {url}: {http_err}")
             raise
         except requests.ConnectionError as e:
-            print(f"Connection error occurred while fetching {url}: {e}")
+            logger.warning(f"Connection error occurred while fetching {url}: {e}")
             raise
 
     def get_first_paragraph(self, html: str) -> str:
         # Parses the HTML content to extract the first meaningful paragraph, ensuring that it is not empty or just a reference.
+        logger.debug("Extracting first paragraph...")
         soup = BeautifulSoup(html, 'html.parser')
         paragraphs = []
         for paragraph in soup.find_all('p'):
@@ -37,6 +44,7 @@ class WikipediaScraper:
     
     def clean_text(self, text: str) -> str:
         # Cleans the extracted text by removing unwanted characters, references, and formatting using regular expressions.
+        logger.debug("Cleaning text...")
         regex_patterns = [r'\[.*?\]|\(\/.*?\/\)|<.*?>|\n|\xa0', r'\[\[(?:[^\]]*?\|)?([^\]]+)\]\]', r'Écouterⓘ', r'Prononciationⓘ', r'(\s)+', r'(\s)+', r'(\s)+']
         for pattern in regex_patterns:
             text = re.sub(pattern, '', text).strip()

@@ -47,8 +47,10 @@ def main():
                 leader['wikipedia_bio'] = paragraph
 
             leaders_by_countries[country] = leaders
+        
+        end_time = time.time()  # end timer
+        logger.info(f"\nPipeline completed in {end_time - start_time:.2f} seconds")
 
-        logger.info("Pipeline completed, saving to leaders.json")
         while True:
             user_input = input("Do you want to save the results to json or csv?: ")
             if user_input == "json":
@@ -63,9 +65,6 @@ def main():
     except Exception as e:
         logger.info(f"Pipeline failed: {e}")
         api_client.refresh_cookies()  # refresh on failure and retry if needed
-
-    end_time = time.time()  # end timer
-    print(f"\nPipeline completed in {end_time - start_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()

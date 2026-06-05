@@ -1,7 +1,5 @@
-from src.html_scraper import WikipediaScraper
-from src.api_client import CountryLeadersAPI
 import requests
-from src.logger import get_logger
+from src import CountryLeadersAPI, WikipediaScraper, get_logger
 logger = get_logger(__name__)
 def main():
     '''

@@ -31,7 +31,16 @@ def main():
                     leader['wikipedia_bio'] = scraper.clean_text(first_paragraph)
             leaders_by_countries[country] = leaders
         logger.info("Pipeline completed, saving to leaders.json")
-        scraper.to_json_file('leaders.json', leaders_by_countries)
+        while True:
+            user_input = input("Do you want to save the results to json or csv?: ")
+            if user_input == "json":
+                scraper.to_json_file('leaders.json', leaders_by_countries)
+                break
+            elif user_input == "csv":
+                scraper.to_csv_file('leaders.csv', leaders_by_countries)
+                break
+            else:
+                print("Invalid input. Please enter 'json' or 'csv'.")
 
     except Exception as e:
         logger.info(f"Pipeline failed: {e}")

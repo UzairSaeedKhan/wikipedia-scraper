@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import json, requests, re
+import json, requests, re, csv
 from src.logger import get_logger
 logger = get_logger(__name__)
 
@@ -70,7 +70,7 @@ class WikipediaScraper:
             text = re.sub(pattern, replacement, text)
         return text.strip()
 
-    def to_json_file(self, filepath: str, data: str) -> None:
+    def to_json_file(self, filepath: str, data: dict) -> None:
         '''
         Stores the data structure into a JSON file, ensuring that the file is properly formatted and human-readable.
         '''
@@ -78,3 +78,27 @@ class WikipediaScraper:
         # here it is important to add ensure_ascii flag and encoding for handling different languages and special characters in the text
         with open(filepath, 'w', encoding='utf-8') as f:
              json.dump(data, f, ensure_ascii=False, indent=4)
+
+    def to_csv_file(self, filepath: str, data: dict) -> None:
+        '''
+        Stores the data structure into a CSV file, ensuring that the file is properly formatted and can be easily opened in spreadsheet software.
+        '''
+        logger.debug(f"Writing data to CSV file: {filepath}")
+        with open(filepath, 'w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Country', "id", "first_name", "last_name", "birth_date", "death_date", "place_of_birth", "wikipedia_url", "start_mandate", "end_mandate", "wikipedia_bio"])
+            for country, leaders in data.items():
+                for leader in leaders:
+                    writer.writerow([
+                        country,
+                        leader.get("id", ""),
+                        leader.get("first_name", ""),
+                        leader.get("last_name", ""),
+                        leader.get("birth_date", ""),
+                        leader.get("death_date", ""),
+                        leader.get("place_of_birth", ""),
+                        leader.get("wikipedia_url", ""),
+                        leader.get("start_mandate", ""),
+                        leader.get("end_mandate", ""),
+                        leader.get("wikipedia_bio", "")
+                    ])

@@ -4,6 +4,11 @@ import requests
 from src.logger import get_logger
 logger = get_logger(__name__)
 def main():
+    '''
+    Main function to connect the entire pipeline. It initializes the API client and scraper with a shared requests.Session, 
+    then executes the steps to fetch countries, retrieve leaders, scrape Wikipedia bios, and save the results to a JSON file. 
+    It also includes error handling to refresh cookies and retry if any step fails.
+    '''
     session = requests.Session()
     session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; my-script/1.0; your@email.com)"})
     

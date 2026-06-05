@@ -1,5 +1,6 @@
 import requests, time
-from src import CountryLeadersAPI, WikipediaScraper, get_logger, ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
+from src import CountryLeadersAPI, WikipediaScraper, get_logger
 logger = get_logger(__name__)
 
 def main():

@@ -6,7 +6,7 @@
 
 ## 📖 Description
 
-A Python pipeline that pulls world leaders from a REST API, scrapes their Wikipedia biographies, cleans the text, and saves everything into a structured JSON file.
+A Python pipeline that pulls world leaders from a REST API, scrapes their Wikipedia biographies, cleans the text, and saves everything into a structured JSON file — all in one run.
 
 The scraper handles multiple languages (English, French, Dutch, Arabic, Russian) and automatically cleans up pronunciation markers, IPA symbols, references, and other Wikipedia noise so the output is clean and human-readable.
 
@@ -63,8 +63,43 @@ The script will:
 - Refresh the API session cookie automatically
 - Fetch the list of available countries
 - Retrieve all leaders per country
-- Scrape and clean each leader's Wikipedia first paragraph
-- Save the full dataset to `leaders.json`
+- Scrape and clean each leader's Wikipedia first paragraph in parallel
+- Prompt you to choose between saving the output as `leaders.json` or `leaders.csv`
+
+---
+
+## ✨ Features
+
+### ⚡ Parallel Scraping with ThreadPoolExecutor
+
+Wikipedia pages are scraped using Python's `concurrent.futures.ThreadPoolExecutor` with 10 parallel workers, meaning all leaders per country are fetched simultaneously instead of one by one.
+
+The difference is significant:
+
+| Mode | Time |
+|------|------|
+| Sequential (no threads) | ~29 seconds |
+| Parallel (ThreadPoolExecutor) | ~18 seconds |
+
+**Sequential run — 29.26 seconds:**
+
+![Sequential](assets/sequential.png)
+
+**Parallel run — 18.79 seconds:**
+
+![Parallel](assets/parallel.png)
+
+---
+
+### 💾 Output Format Choice
+
+Once the pipeline finishes, you are prompted to choose your preferred output format:
+
+```
+Do you want to save the results to json or csv?:
+```
+
+Type `json` to save as `leaders.json` or `csv` to save as `leaders.csv` — the file is generated accordingly.
 
 ---
 
@@ -88,15 +123,6 @@ The script will:
 }
 ```
 
-**Runtime logs:**
-
-```
-2026-06-05 10:23:01 - src.api_client - INFO - Refreshing cookies...
-2026-06-05 10:23:02 - src.api_client - INFO - Fetching leaders for us...
-2026-06-05 10:23:03 - src.html_scraper - INFO - Fetching HTML for https://en.wikipedia.org/wiki/Barack_Obama
-2026-06-05 10:23:18 - main - INFO - Pipeline completed, saving to leaders.json
-```
-
 ---
 
 ## 🧰 Tech Stack
@@ -107,6 +133,8 @@ The script will:
 | `BeautifulSoup` | HTML parsing |
 | `re` | Text cleaning with regex |
 | `json` | Saving output data |
+| `csv` | Saving output as CSV |
+| `concurrent.futures` | Parallel scraping with ThreadPoolExecutor |
 | `logging` | Runtime tracking and warnings |
 
 ---

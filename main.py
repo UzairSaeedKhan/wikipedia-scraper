@@ -1,8 +1,8 @@
-from src.html_scraper import WikipediaScraper
-from src.api_client import CountryLeadersAPI
-import requests
-from src.logger import get_logger
+import requests, time
+from concurrent.futures import ThreadPoolExecutor
+from src import CountryLeadersAPI, WikipediaScraper, get_logger
 logger = get_logger(__name__)
+
 def main():
     '''
     Main function to connect the entire pipeline. It initializes the API client and scraper with a shared requests.Session, 
@@ -15,6 +15,8 @@ def main():
     api_client = CountryLeadersAPI(session)
     scraper = WikipediaScraper(session)
 
+    start_time = time.time()  # start timer
+
     try:
         logger.info("Pipeline started")
         api_client.refresh_cookies()  # refreshes cookies on the shared session
@@ -22,14 +24,30 @@ def main():
         leaders_by_countries = {}
 
         for country in countries:
+            logger.info(f"Processing country: {country}")
             leaders = api_client.get_leaders(country)
-            for leader in leaders:
-                wiki_url = leader.get('wikipedia_url')
-                if wiki_url:
-                    html_content = scraper.fetch_html(wiki_url)
-                    first_paragraph = scraper.get_first_paragraph(html_content)
-                    leader['wikipedia_bio'] = scraper.clean_text(first_paragraph)
+
+            # collect all wikipedia urls for this country
+            urls = [leader.get('wikipedia_url') for leader in leaders]
+
+            # scrape all pages in parallel
+            def scrape(url):
+                if url:
+                    return scraper.clean_text(
+                        scraper.get_first_paragraph(
+                            scraper.fetch_html(url)
+                        )
+                    )
+                return None
+
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                paragraphs = list(executor.map(scrape, urls))
+
+            for leader, paragraph in zip(leaders, paragraphs):
+                leader['wikipedia_bio'] = paragraph
+
             leaders_by_countries[country] = leaders
+
         logger.info("Pipeline completed, saving to leaders.json")
         while True:
             user_input = input("Do you want to save the results to json or csv?: ")
@@ -45,6 +63,9 @@ def main():
     except Exception as e:
         logger.info(f"Pipeline failed: {e}")
         api_client.refresh_cookies()  # refresh on failure and retry if needed
+
+    end_time = time.time()  # end timer
+    print(f"\nPipeline completed in {end_time - start_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()

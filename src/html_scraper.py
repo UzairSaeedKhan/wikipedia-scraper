@@ -69,6 +69,16 @@ class WikipediaScraper:
             replacement = ' ' if pattern == r'\s+' else ''
             text = re.sub(pattern, replacement, text)
         return text.strip()
+    
+    # scrape all pages in parallel
+    def scrape(self, url):
+        if url:
+            return self.clean_text(
+                self.get_first_paragraph(
+                    self.fetch_html(url)
+                )
+            )
+        return None
 
     def to_json_file(self, filepath: str, data: dict) -> None:
         '''

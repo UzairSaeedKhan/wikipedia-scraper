@@ -30,18 +30,8 @@ def main():
             # collect all wikipedia urls for this country
             urls = [leader.get('wikipedia_url') for leader in leaders]
 
-            # scrape all pages in parallel
-            def scrape(url):
-                if url:
-                    return scraper.clean_text(
-                        scraper.get_first_paragraph(
-                            scraper.fetch_html(url)
-                        )
-                    )
-                return None
-
             with ThreadPoolExecutor(max_workers=10) as executor:
-                paragraphs = list(executor.map(scrape, urls))
+                paragraphs = list(executor.map(scraper.scrape, urls))
 
             for leader, paragraph in zip(leaders, paragraphs):
                 leader['wikipedia_bio'] = paragraph

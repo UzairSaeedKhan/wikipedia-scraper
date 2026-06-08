@@ -6,7 +6,7 @@
 
 ## 📖 Description
 
-A Python pipeline that pulls world leaders from a REST API, scrapes their Wikipedia biographies, cleans the text, and saves everything into a structured JSON file — all in one run.
+A Python pipeline that pulls world leaders from a REST API, scrapes their Wikipedia biographies, cleans the text, and saves everything into a structured JSON file.
 
 The scraper handles multiple languages (English, French, Dutch, Arabic, Russian) and automatically cleans up pronunciation markers, IPA symbols, references, and other Wikipedia noise so the output is clean and human-readable.
 
@@ -107,7 +107,7 @@ Type `json` to save as `leaders.json` or `csv` to save as `leaders.csv` — the 
 
 **Pipeline flow:**
 
-![Pipeline](https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&auto=format&fit=crop&q=60)
+![Pipeline](assets/wikipedia-scraper-pipeline.png)
 
 **Sample output in `leaders.json`:**
 
